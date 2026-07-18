@@ -163,12 +163,12 @@
   .tk-image.web img{height:auto;}
   .tk-image.mobile{height:640px;width:max-content;margin-left:auto;margin-right:auto;border-radius:40px;}
   .tk-image.mobile img{width:auto;height:100%;border-radius:40px;}
-  .tk-image-row{display:flex;gap:24px;margin-bottom:56px;}
+  .tk-image-row{display:flex;gap:24px;margin-bottom:56px;justify-content:center;}
   .tk-image-row .tk-image{margin-bottom:0;flex:1;min-width:0;height:320px;}
   .tk-image-row.mobile-row{gap:48px;}
   .tk-image-row.mobile-row .tk-image{height:581px;}
-  .tk-image-row .tk-image.mobile{width:auto;margin-left:0;margin-right:0;}
-  .tk-image-row .tk-image.mobile img{width:100%;height:100%;object-fit:contain;}
+  .tk-image-row .tk-image.mobile{flex:0 1 auto;width:auto;min-width:0;margin-left:0;margin-right:0;}
+  .tk-image-row .tk-image.mobile img{width:auto;max-width:100%;height:100%;object-fit:contain;}
   .tk-image img{width:100%;height:100%;object-fit:contain;border-radius:24px;}
   .behind{background:transparent;border-radius:16px;padding:36px 0 12px;margin-bottom:56px;width:100%;}
   .behind-label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;}
@@ -338,14 +338,14 @@ const projects = [
     scope: "Led design for both features from exploration to build. Research revealed an asymmetry that shaped everything: with captions, advertisers wanted to know the feature existed, wanted an off switch and the ability to edit — but had little desire to review each generated variant, and experiments showed that auto-serving different caption variants to different users actually performed better. So caption generation became a quiet, low-touch item, tucked out of the main path. Image generation was the opposite: media is the most important element of an ad, and advertisers universally wanted to review, select, and choose their images — so it was baked directly into the core Boost flow. Same technology, opposite treatments, both decided by evidence.",
     images: [
       [
-        { src: "images/case-2-genai-caption-image/phone-1-captions.png", type: "mobile" },
-        { src: "images/case-2-genai-caption-image/mainhero-2.gif", type: "mobile" }
+        { src: "images/case-2-genai-caption-image/phone-1-captions.png", type: "mobile", radius: 34 },
+        { src: "images/case-2-genai-caption-image/mainhero-2.gif", type: "mobile", radius: 34 }
       ],
       { src: "images/case-2-genai-caption-image/drilldown-3.gif", type: "web" }
     ],
     thumbRow: [
-      { src: "images/case-2-genai-caption-image/phone-1-captions.png" },
-      { src: "images/case-2-genai-caption-image/mainhero-2.gif" }
+      { src: "images/case-2-genai-caption-image/phone-1-captions.png", radius: 34 },
+      { src: "images/case-2-genai-caption-image/mainhero-2.gif", radius: 34 }
     ],
     thumbScale: 0.85,
     thumbGap: 100,

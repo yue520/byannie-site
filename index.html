@@ -121,7 +121,7 @@
 
   /* contact (merged with about) */
   .contact-section{padding:60px 40px 80px;max-width:680px;}
-  .contact-bio{font-size:17px;line-height:1.3;color:var(--fg-mid);margin-bottom:14px;}
+  .contact-bio{font-size:15px;line-height:1.3;color:var(--fg-mid);margin-bottom:14px;}
   .contact-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;}
   .contact-row a.btn{font-size:14px;border:1px solid var(--line);padding:10px 20px;border-radius:6px;}
   .contact-row a.btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -137,7 +137,7 @@
   ::view-transition-old(root),::view-transition-new(root){animation-duration:.4s;}
   .takeover-close{
     position:fixed;top:26px;right:32px;background:var(--bg);border:1px solid var(--line);
-    color:var(--fg);width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;z-index:2;
+    color:var(--fg);width:44px;height:44px;border-radius:50%;font-size:24px;cursor:pointer;z-index:2;
   }
   .takeover-inner{max-width:1404px;margin:0 auto;padding:64px 200px 120px;}
   .tk-text{width:100%;}
@@ -324,7 +324,7 @@ const projects = [
   {
     tag: "0 → 1 monetization",
     title: "GenAI Creative Tools — Captions & Image Generation",
-    role: "Lead designer, end-to-end experience", timeframe: "2022–2024", tools: "Figma",
+    role: "Lead designer, end-to-end experience", timeframe: "2022–2024", tools: "Figma, Cursor, Claude",
     peopleProblem: "Most Boost advertisers aren't marketers. They have a post and a budget, but writing ad copy and producing visuals are skills they don't have and can't hire for.",
     hypothesis: "Generative AI could close the creative-skill gap — but text and images demand different levels of user control, and the right treatment for each could only be determined through research.",
     scope: "Led design for both features from exploration to build. Research revealed an asymmetry that shaped everything: with captions, advertisers wanted to know the feature existed, wanted an off switch and the ability to edit — but had little desire to review each generated variant, and experiments showed that auto-serving different caption variants to different users actually performed better. So caption generation became a quiet, low-touch item, tucked out of the main path. Image generation was the opposite: media is the most important element of an ad, and advertisers universally wanted to review, select, and choose their images — so it was baked directly into the core Boost flow. Same technology, opposite treatments, both decided by evidence.",
@@ -335,9 +335,9 @@ const projects = [
       ],
       { src: "images/case-2-genai-caption-image/drilldown-3.gif", type: "web" }
     ],
-    thumb: "images/case-2-genai-caption-image/thumb.png",
-    thumbScale: 0.85,
-    thumbGap: 100,
+    thumb: "images/case-2-genai-caption-image/mainhero-2.gif",
+    thumbRadius: 40,
+    singleMobileHero: true,
     cardHeadline: "GenAI Creative Tools — Captions & Image Generation",
     cardBody: "Two generative AI features helping advertisers make better creatives: captions that quietly generate and serve the variation most likely to perform, and image generation that puts a set of AI-created visuals in advertisers' hands to pick from."
   },
@@ -480,7 +480,17 @@ function renderImageRows(container, rows, altLabel){
   });
 }
 let lastClickedThumb = null;
+let lastOpenedProject = null;
 const HERO_TRANSITION_NAME = 'hero-morph';
+function heroElFor(p){
+  const candidates = [...document.querySelectorAll('#tk-images-top .tk-image')];
+  if(!candidates.length) return null;
+  const match = candidates.find(el => {
+    const img = el.querySelector('img');
+    return img && p && p.thumb && img.getAttribute('src') === p.thumb;
+  });
+  return match || candidates[0];
+}
 function openTakeover(p){
   document.getElementById('tk-title').textContent = p.title;
   document.getElementById('tk-role').textContent = p.role;
@@ -512,6 +522,8 @@ function closeTakeover(){
 }
 function openTakeoverWithTransition(p, thumbEl){
   lastClickedThumb = thumbEl || null;
+  lastOpenedProject = p;
+  history.pushState({ takeoverOpen: true }, '');
   const supportsVT = typeof document.startViewTransition === 'function';
   if(!supportsVT || !thumbEl){
     openTakeover(p);
@@ -522,19 +534,19 @@ function openTakeoverWithTransition(p, thumbEl){
   const vt = document.startViewTransition(() => {
     thumbEl.style.viewTransitionName = '';
     openTakeover(p);
-    const heroEl = document.querySelector('#tk-images-top .tk-image');
+    const heroEl = heroElFor(p);
     if(heroEl) heroEl.style.viewTransitionName = HERO_TRANSITION_NAME;
   });
   vt.finished.finally(() => {
     thumbEl.style.viewTransitionName = '';
-    const heroEl = document.querySelector('#tk-images-top .tk-image');
+    const heroEl = heroElFor(p);
     if(heroEl) heroEl.style.viewTransitionName = '';
     takeover.style.transition = '';
   });
 }
 function closeTakeoverWithTransition(){
   const supportsVT = typeof document.startViewTransition === 'function';
-  const heroEl = document.querySelector('#tk-images-top .tk-image');
+  const heroEl = heroElFor(lastOpenedProject);
   if(!supportsVT || !heroEl || !lastClickedThumb){
     closeTakeover();
     return;
@@ -552,8 +564,18 @@ function closeTakeoverWithTransition(){
     takeover.style.transition = '';
   });
 }
-document.getElementById('takeover-close').addEventListener('click', closeTakeoverWithTransition);
-document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeTakeoverWithTransition(); });
+function requestCloseTakeover(){
+  if(history.state && history.state.takeoverOpen){
+    history.back();
+  } else {
+    closeTakeoverWithTransition();
+  }
+}
+window.addEventListener('popstate', () => {
+  if(takeover.classList.contains('open')) closeTakeoverWithTransition();
+});
+document.getElementById('takeover-close').addEventListener('click', requestCloseTakeover);
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') requestCloseTakeover(); });
 
 /* scrollspy for sidebar nav */
 const navLinks = Array.from(document.querySelectorAll('#sidebar-nav a'));

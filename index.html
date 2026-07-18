@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Annie Zhao — Product Designer</title>
+<link rel="icon" type="image/png" href="images/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -114,13 +115,13 @@
   .history-logo img{height:100%;width:auto;max-width:180px;object-fit:contain;}
   .history-logo img.invert{filter:invert(1);}
   .history-company-label{font-size:15px;color:var(--fg-mid);margin-bottom:6px;}
-  .history-title{font-size:clamp(26px,3.6vw,40px);font-weight:400;line-height:1.1;margin-bottom:16px;letter-spacing:-.01em;}
+  .history-title{font-size:32px;font-weight:400;line-height:1.1;margin-bottom:16px;letter-spacing:-.01em;}
   .history-meta{font-size:14px;color:var(--fg);font-weight:600;margin-bottom:14px;display:flex;gap:10px;}
   .history-desc{font-size:15px;color:var(--fg-mid);max-width:560px;line-height:1.7;}
 
   /* contact (merged with about) */
   .contact-section{padding:60px 40px 80px;max-width:680px;}
-  .contact-bio{font-size:17px;line-height:1.3;color:var(--fg);margin-bottom:14px;}
+  .contact-bio{font-size:17px;line-height:1.3;color:var(--fg-mid);margin-bottom:14px;}
   .contact-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;}
   .contact-row a.btn{font-size:14px;border:1px solid var(--line);padding:10px 20px;border-radius:6px;}
   .contact-row a.btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -267,7 +268,7 @@
       <div class="history-title">About me</div>
       <p class="contact-bio">With 15+ years across enterprise advertising, payments, and internal platforms, I've built a career on products where the stakes are real and the systems are complex. I'm currently a Product Designer at Instagram, leading design for Boost across mobile and web. Previously I designed billing and payments systems at Facebook, worked on the Core Terminal at Bloomberg, and led design across e-commerce, payments, and IoT at Jet.com, WePay, and Samsung SmartThings. I trained as both an engineer and an artist — a Computer Science degree and a Fine Art degree — before completing my M.S. in Human-Computer Interaction at Carnegie Mellon. I live in San Diego, where the sun makes it very hard to stay inside.</p>
       <div class="contact-row">
-        <a class="btn" href="#" target="_blank">LinkedIn</a>
+        <a class="btn" href="https://www.linkedin.com/in/anniezhaodesign/" target="_blank">LinkedIn</a>
         <a class="btn" href="mailto:annieyue.zhao@gmail.com">annieyue.zhao@gmail.com</a>
       </div>
     </section>
@@ -328,7 +329,10 @@ const projects = [
     hypothesis: "Generative AI could close the creative-skill gap — but text and images demand different levels of user control, and the right treatment for each could only be determined through research.",
     scope: "Led design for both features from exploration to build. Research revealed an asymmetry that shaped everything: with captions, advertisers wanted to know the feature existed, wanted an off switch and the ability to edit — but had little desire to review each generated variant, and experiments showed that auto-serving different caption variants to different users actually performed better. So caption generation became a quiet, low-touch item, tucked out of the main path. Image generation was the opposite: media is the most important element of an ad, and advertisers universally wanted to review, select, and choose their images — so it was baked directly into the core Boost flow. Same technology, opposite treatments, both decided by evidence.",
     images: [
-      { src: "images/case-2-genai-caption-image/thumb.png", type: "mobile" },
+      [
+        { src: "images/case-2-genai-caption-image/phone-1-captions.png", type: "mobile" },
+        { src: "images/case-2-genai-caption-image/mainhero-2.gif", type: "mobile" }
+      ],
       { src: "images/case-2-genai-caption-image/drilldown-3.gif", type: "web" }
     ],
     thumb: "images/case-2-genai-caption-image/thumb.png",

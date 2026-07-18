@@ -73,11 +73,18 @@
     left:calc(46cqw + 220px);
     height:72vh;
   }
+  .project-thumb-row{
+    position:absolute;bottom:12%;left:46cqw;
+    height:80vh;display:flex;gap:27px;z-index:1;pointer-events:none;
+  }
+  .project-thumb-row-img{height:100%;width:auto;max-width:none;}
   .has-thumb .project-content{
     position:absolute;left:40px;right:40px;bottom:18%;
   }
   @media (max-width:860px){
     .project-thumb-img{position:static;bottom:auto;left:auto;width:70cqw;height:auto;margin-top:24px;}
+    .project-thumb-row{position:static;bottom:auto;left:auto;height:auto;width:70cqw;margin-top:24px;gap:16px;}
+    .project-thumb-row-img{height:auto;width:0;flex:1 1 0;}
     .has-thumb .project-content{position:static;left:auto;right:auto;bottom:auto;}
   }
   .project-card-headline{
@@ -132,8 +139,9 @@
     transform:translateY(100%);transition:transform .5s cubic-bezier(.2,.8,.2,1);overflow-y:auto;
   }
   .takeover.open{transform:translateY(0);}
-  ::view-transition-group(hero-morph){animation-duration:.55s;animation-timing-function:cubic-bezier(.2,.8,.2,1);}
-  ::view-transition-old(hero-morph),::view-transition-new(hero-morph){animation:none;opacity:1;mix-blend-mode:normal;}
+  ::view-transition-group(*){animation-duration:.55s;animation-timing-function:cubic-bezier(.2,.8,.2,1);}
+  ::view-transition-old(*),::view-transition-new(*){animation:none;opacity:1;mix-blend-mode:normal;}
+  ::view-transition-group(root){animation-duration:.4s;}
   ::view-transition-old(root),::view-transition-new(root){animation-duration:.4s;}
   .takeover-close{
     position:fixed;top:26px;right:32px;background:var(--bg);border:1px solid var(--line);
@@ -182,7 +190,7 @@
     .hero-full p{font-size:clamp(31px,7.5vw,60px);}
     .project-thumb-img,.project-thumb-img.single-mobile-hero{width:70cqw !important;height:auto !important;}
     .project-section:nth-of-type(1) .project-thumb-img{width:49cqw !important;}
-    .project-section:nth-of-type(2) .project-thumb-img{width:84cqw !important;}
+    .project-section:nth-of-type(2) .project-thumb-row{width:84cqw !important;height:auto !important;}
     .project-section:nth-of-type(3) .project-thumb-img{width:91cqw !important;}
     .project-section:nth-of-type(4) .project-thumb-img{width:49cqw !important;}
     .project-section:nth-of-type(5) .project-thumb-img{width:91cqw !important;}
@@ -335,9 +343,12 @@ const projects = [
       ],
       { src: "images/case-2-genai-caption-image/drilldown-3.gif", type: "web" }
     ],
-    thumb: "images/case-2-genai-caption-image/mainhero-2.gif",
-    thumbRadius: 40,
-    singleMobileHero: true,
+    thumbRow: [
+      { src: "images/case-2-genai-caption-image/phone-1-captions.png" },
+      { src: "images/case-2-genai-caption-image/mainhero-2.gif" }
+    ],
+    thumbScale: 0.85,
+    thumbGap: 100,
     cardHeadline: "GenAI Creative Tools — Captions & Image Generation",
     cardBody: "Two generative AI features helping advertisers make better creatives: captions that quietly generate and serve the variation most likely to perform, and image generation that puts a set of AI-created visuals in advertisers' hands to pick from."
   },
@@ -404,22 +415,34 @@ const work = document.getElementById('work');
 const bgShades = ['#141210','#161310','#121110','#151210','#131110'];
 projects.forEach((p, i) => {
   const sec = document.createElement('div');
-  sec.className = 'project-section' + (p.thumb ? ' has-thumb' : '');
+  const hasHero = !!(p.thumb || p.thumbRow);
+  sec.className = 'project-section' + (hasHero ? ' has-thumb' : '');
   const placeholderMarkup = `
     <div class="thumb-pattern"></div>
     <span class="thumb-icon">Project thumbnail — replace with image</span>
   `;
-  sec.style.background = p.thumb ? '#000000' : bgShades[i % bgShades.length];
+  sec.style.background = hasHero ? '#000000' : bgShades[i % bgShades.length];
+  const heroMarkup = p.thumbRow ? (() => {
+    const rowStyles = [];
+    if(p.thumbScale) rowStyles.push(`height:${80 * p.thumbScale}vh`);
+    if(p.thumbGap) rowStyles.push(`left:calc(46cqw + ${p.thumbGap}px)`);
+    const rowStyleAttr = rowStyles.length ? ` style="${rowStyles.join(';')}"` : '';
+    const imgs = p.thumbRow.map(item => {
+      const r = item.radius || p.thumbRadius || 40;
+      return `<img class="project-thumb-row-img" src="${item.src}" alt="${p.title}" style="border-radius:${r}px">`;
+    }).join('');
+    return `<div class="project-thumb-row"${rowStyleAttr}>${imgs}</div>`;
+  })() : (p.thumb ? (() => {
+    const styles = [];
+    if(p.thumbScale) styles.push(`height:${80 * p.thumbScale}vh`);
+    if(p.thumbRadius) styles.push(`border-radius:${p.thumbRadius}px`);
+    if(p.thumbGap) styles.push(`left:calc(46cqw + ${p.thumbGap}px)`);
+    const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
+    const cls = 'project-thumb-img' + (p.singleMobileHero ? ' single-mobile-hero' : '');
+    return `<img class="${cls}" src="${p.thumb}" alt="${p.title}"${styleAttr}>`;
+  })() : placeholderMarkup);
   sec.innerHTML = `
-    ${p.thumb ? (() => {
-      const styles = [];
-      if(p.thumbScale) styles.push(`height:${80 * p.thumbScale}vh`);
-      if(p.thumbRadius) styles.push(`border-radius:${p.thumbRadius}px`);
-      if(p.thumbGap) styles.push(`left:calc(46cqw + ${p.thumbGap}px)`);
-      const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
-      const cls = 'project-thumb-img' + (p.singleMobileHero ? ' single-mobile-hero' : '');
-      return `<img class="${cls}" src="${p.thumb}" alt="${p.title}"${styleAttr}>`;
-    })() : placeholderMarkup}
+    ${heroMarkup}
     ${p.cardHeadline ? '' : `<div class="project-tag">${p.tag}</div>`}
     <div class="project-index">0${i+1}</div>
     <div class="project-content">
@@ -428,11 +451,14 @@ projects.forEach((p, i) => {
         : `<div class="project-title">${p.title}</div><div class="project-oneliner">${p.oneLiner}</div><span class="project-cta">View case study →</span>`}
     </div>
   `;
-  sec.addEventListener('click', () => openTakeoverWithTransition(p, sec.querySelector('.project-thumb-img')));
+  sec.addEventListener('click', () => {
+    const thumbEls = [...sec.querySelectorAll('.project-thumb-img, .project-thumb-row-img')];
+    openTakeoverWithTransition(p, thumbEls);
+  });
   work.appendChild(sec);
 
-  if(p.thumb){
-    const imgEl = sec.querySelector('.project-thumb-img');
+  if(hasHero){
+    const imgEl = sec.querySelector('.project-thumb-img') || sec.querySelector('.project-thumb-row');
     const idxEl = sec.querySelector('.project-index');
     const alignIndexToImage = () => {
       const imgTop = imgEl.getBoundingClientRect().top;
@@ -479,17 +505,14 @@ function renderImageRows(container, rows, altLabel){
     }
   });
 }
-let lastClickedThumb = null;
+let lastClickedThumbs = [];
 let lastOpenedProject = null;
-const HERO_TRANSITION_NAME = 'hero-morph';
-function heroElFor(p){
-  const candidates = [...document.querySelectorAll('#tk-images-top .tk-image')];
-  if(!candidates.length) return null;
-  const match = candidates.find(el => {
-    const img = el.querySelector('img');
-    return img && p && p.thumb && img.getAttribute('src') === p.thumb;
-  });
-  return match || candidates[0];
+function transitionNameFor(src){
+  return 'tn-' + encodeURIComponent(src).replace(/[^a-zA-Z0-9]/g, '-');
+}
+function drilldownElFor(src){
+  const img = document.querySelector('#tk-images-top .tk-image img[src="' + src + '"]');
+  return img ? img.closest('.tk-image') : null;
 }
 function openTakeover(p){
   document.getElementById('tk-title').textContent = p.title;
@@ -520,47 +543,57 @@ function closeTakeover(){
   takeover.classList.remove('open');
   document.body.style.overflow = '';
 }
-function openTakeoverWithTransition(p, thumbEl){
-  lastClickedThumb = thumbEl || null;
+function openTakeoverWithTransition(p, thumbEls){
+  lastClickedThumbs = thumbEls || [];
   lastOpenedProject = p;
   history.pushState({ takeoverOpen: true }, '');
   const supportsVT = typeof document.startViewTransition === 'function';
-  if(!supportsVT || !thumbEl){
+  if(!supportsVT || !lastClickedThumbs.length){
     openTakeover(p);
     return;
   }
-  thumbEl.style.viewTransitionName = HERO_TRANSITION_NAME;
+  lastClickedThumbs.forEach(el => { el.style.viewTransitionName = transitionNameFor(el.getAttribute('src')); });
   takeover.style.transition = 'none';
   const vt = document.startViewTransition(() => {
-    thumbEl.style.viewTransitionName = '';
+    lastClickedThumbs.forEach(el => { el.style.viewTransitionName = ''; });
     openTakeover(p);
-    const heroEl = heroElFor(p);
-    if(heroEl) heroEl.style.viewTransitionName = HERO_TRANSITION_NAME;
+    lastClickedThumbs.forEach(el => {
+      const heroEl = drilldownElFor(el.getAttribute('src'));
+      if(heroEl) heroEl.style.viewTransitionName = transitionNameFor(el.getAttribute('src'));
+    });
   });
   vt.finished.finally(() => {
-    thumbEl.style.viewTransitionName = '';
-    const heroEl = heroElFor(p);
-    if(heroEl) heroEl.style.viewTransitionName = '';
+    lastClickedThumbs.forEach(el => {
+      el.style.viewTransitionName = '';
+      const heroEl = drilldownElFor(el.getAttribute('src'));
+      if(heroEl) heroEl.style.viewTransitionName = '';
+    });
     takeover.style.transition = '';
   });
 }
 function closeTakeoverWithTransition(){
   const supportsVT = typeof document.startViewTransition === 'function';
-  const heroEl = heroElFor(lastOpenedProject);
-  if(!supportsVT || !heroEl || !lastClickedThumb){
+  const pairs = lastClickedThumbs
+    .map(thumbEl => ({ thumbEl, heroEl: drilldownElFor(thumbEl.getAttribute('src')) }))
+    .filter(pair => pair.heroEl);
+  if(!supportsVT || !pairs.length){
     closeTakeover();
     return;
   }
-  heroEl.style.viewTransitionName = HERO_TRANSITION_NAME;
+  pairs.forEach(({ thumbEl, heroEl }) => {
+    const name = transitionNameFor(thumbEl.getAttribute('src'));
+    heroEl.style.viewTransitionName = name;
+  });
   takeover.style.transition = 'none';
-  const thumbEl = lastClickedThumb;
   const vt = document.startViewTransition(() => {
-    heroEl.style.viewTransitionName = '';
+    pairs.forEach(({ heroEl }) => { heroEl.style.viewTransitionName = ''; });
     closeTakeover();
-    thumbEl.style.viewTransitionName = HERO_TRANSITION_NAME;
+    pairs.forEach(({ thumbEl }) => {
+      thumbEl.style.viewTransitionName = transitionNameFor(thumbEl.getAttribute('src'));
+    });
   });
   vt.finished.finally(() => {
-    thumbEl.style.viewTransitionName = '';
+    pairs.forEach(({ thumbEl }) => { thumbEl.style.viewTransitionName = ''; });
     takeover.style.transition = '';
   });
 }

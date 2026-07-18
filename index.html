@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annie Zhao — Product Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0B0C;
+    --fg:#F3F1EA;
+    --fg-dim:#8E8A7F;
+    --fg-mid:#B5B0A3;
+    --accent:#E8A33D;
+    --line:rgba(255,255,255,0.14);
+    --panel:#17150F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-snap-type:y proximity;}
+  body{
+    background:var(--bg);color:var(--fg);
+    font-family:'Archivo',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  .layout{display:flex;}
+
+  /* left sidebar — persistent, plain stacked links, scrollspy */
+  .sidebar{
+    width:220px;flex:0 0 220px;position:sticky;top:0;height:100vh;
+    padding:32px 26px;display:flex;flex-direction:column;z-index:60;
+  }
+  .wordmark{font-size:15px;font-weight:700;margin-bottom:32px;letter-spacing:-.01em;}
+  .sidebar nav{display:flex;flex-direction:column;gap:15px;}
+  .sidebar nav a{font-size:14px;color:var(--fg-dim);transition:color .2s ease;font-weight:500;}
+  .sidebar nav a.active,.sidebar nav a:hover{color:var(--fg);}
+  .sidebar .status{margin-top:auto;font-size:12px;color:var(--fg-dim);display:flex;align-items:center;gap:8px;}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:#6FCF97;}
+
+  .main{flex:1;min-width:0;}
+
+  /* hero */
+  .hero-full{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 40px;scroll-snap-align:start;}
+  .hero-full p{color:var(--fg);font-family:'Inter',sans-serif;font-weight:700;font-size:clamp(24px,4.2vw,60px);line-height:1.2;max-width:990px;}
+
+  /* project sections — read as big image slots */
+  .project-section{
+    min-height:100vh;scroll-snap-align:start;position:relative;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:60px 40px;cursor:pointer;
+    background-size:cover;background-position:center;overflow:hidden;
+    container-type:inline-size;
+  }
+  .project-section .thumb-pattern{
+    position:absolute;inset:0;
+    background-image:repeating-linear-gradient(135deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 26px);
+  }
+  .project-section .thumb-icon{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    font-size:13px;color:var(--fg-dim);letter-spacing:.1em;text-transform:uppercase;
+    border:1px dashed var(--line);padding:10px 18px;border-radius:100px;opacity:.6;
+  }
+  .project-thumb-img{
+    position:absolute;bottom:12%;left:46cqw;
+    height:80vh;width:auto;max-width:none;z-index:1;pointer-events:none;border-radius:24px;
+  }
+  .project-thumb-img.single-mobile-hero{
+    left:calc(46cqw + 220px);
+    height:72vh;
+  }
+  .has-thumb .project-content{
+    position:absolute;left:40px;right:40px;bottom:18%;
+  }
+  @media (max-width:860px){
+    .project-thumb-img{position:static;bottom:auto;left:auto;width:70cqw;height:auto;margin-top:24px;}
+    .has-thumb .project-content{position:static;left:auto;right:auto;bottom:auto;}
+  }
+  .project-card-headline{
+    font-family:'Inter',sans-serif;font-weight:700;font-size:clamp(18px,4.2cqw,68px);
+    line-height:1.05;letter-spacing:-.01em;max-width:42cqw;
+  }
+  .project-card-body{
+    font-family:'Inter',sans-serif;font-weight:400;font-size:15px;
+    line-height:1.7;color:var(--fg-dim);margin-top:1.2em;max-width:38cqw;
+  }
+  .has-thumb .project-index{left:40px;right:auto;font-size:clamp(24px,4.5cqw,64px);}
+  @media (max-width:860px){
+    .project-card-headline,.project-card-body{max-width:100%;}
+  }
+  .project-section::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:65%;
+    background:linear-gradient(to top, rgba(11,11,12,0.92), rgba(11,11,12,0));pointer-events:none;
+  }
+  .project-content{position:relative;z-index:2;}
+  .project-tag{position:absolute;top:60px;left:40px;font-size:13px;color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;z-index:2;}
+  .project-index{position:absolute;top:56px;right:40px;font-size:56px;font-weight:900;color:rgba(255,255,255,0.18);z-index:2;}
+  .project-title{font-size:clamp(32px,6vw,76px);font-weight:900;line-height:1;letter-spacing:-.02em;max-width:820px;}
+  .project-oneliner{margin-top:18px;color:var(--fg-dim);font-size:15px;line-height:1.7;max-width:520px;}
+  .project-cta{margin-top:28px;font-size:13px;color:var(--fg);border-bottom:1px solid var(--accent);display:inline-block;width:fit-content;padding-bottom:2px;}
+
+  /* background section — logo, company label, big title, meta line, description */
+  .background-section{padding:80px 40px;max-width:640px;}
+  .section-label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:32px;}
+  .history-entry{padding:48px 0;}
+  .history-logo{
+    height:48px;
+    display:flex;align-items:center;justify-content:flex-start;font-size:19px;font-weight:700;
+    color:var(--fg-dim);margin-bottom:26px;
+  }
+  .history-logo img{height:100%;width:auto;max-width:180px;object-fit:contain;}
+  .history-logo img.invert{filter:invert(1);}
+  .history-company-label{font-size:15px;color:var(--fg-mid);margin-bottom:6px;}
+  .history-title{font-size:clamp(26px,3.6vw,40px);font-weight:400;line-height:1.1;margin-bottom:16px;letter-spacing:-.01em;}
+  .history-meta{font-size:14px;color:var(--fg);font-weight:600;margin-bottom:14px;display:flex;gap:10px;}
+  .history-desc{font-size:15px;color:var(--fg-mid);max-width:560px;line-height:1.7;}
+
+  /* contact (merged with about) */
+  .contact-section{padding:60px 40px 80px;max-width:680px;}
+  .contact-bio{font-size:17px;line-height:1.3;color:var(--fg);margin-bottom:14px;}
+  .contact-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;}
+  .contact-row a.btn{font-size:14px;border:1px solid var(--line);padding:10px 20px;border-radius:6px;}
+  .contact-row a.btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* takeover drill-down */
+  .takeover{
+    position:fixed;inset:0;background:var(--bg);z-index:70;
+    transform:translateY(100%);transition:transform .5s cubic-bezier(.2,.8,.2,1);overflow-y:auto;
+  }
+  .takeover.open{transform:translateY(0);}
+  ::view-transition-group(hero-morph){animation-duration:.55s;animation-timing-function:cubic-bezier(.2,.8,.2,1);}
+  ::view-transition-old(hero-morph),::view-transition-new(hero-morph){animation:none;opacity:1;mix-blend-mode:normal;}
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:.4s;}
+  .takeover-close{
+    position:fixed;top:26px;right:32px;background:var(--bg);border:1px solid var(--line);
+    color:var(--fg);width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;z-index:2;
+  }
+  .takeover-inner{max-width:1404px;margin:0 auto;padding:64px 200px 120px;}
+  .tk-text{width:100%;}
+  .takeover h2{font-size:clamp(30px,5vw,52px);font-weight:900;line-height:1.05;margin-bottom:16px;letter-spacing:-.01em;}
+  .takeover .one-liner{color:var(--fg-dim);font-size:15px;line-height:1.7;margin-bottom:20px;}
+  .takeover-overview{font-size:15px;color:var(--fg-dim);line-height:1.7;margin-bottom:56px;}
+  .section-index{font-size:12px;color:var(--accent);font-weight:700;margin-bottom:22px;letter-spacing:.1em;text-transform:uppercase;}
+  .tk-image{
+    width:100%;height:520px;background:var(--panel);border:1px dashed var(--line);border-radius:24px;
+    display:flex;align-items:center;justify-content:center;color:var(--fg-dim);font-size:13px;
+    margin-bottom:56px;text-align:center;padding:12px;overflow:hidden;
+  }
+  .tk-image.has-image{background:transparent;border:none;padding:0;}
+  .tk-image.web{height:auto;}
+  .tk-image.web img{height:auto;}
+  .tk-image.mobile{height:640px;width:max-content;margin-left:auto;margin-right:auto;border-radius:40px;}
+  .tk-image.mobile img{width:auto;height:100%;border-radius:40px;}
+  .tk-image-row{display:flex;gap:24px;margin-bottom:56px;}
+  .tk-image-row .tk-image{margin-bottom:0;flex:1;min-width:0;height:320px;}
+  .tk-image-row.mobile-row{gap:48px;}
+  .tk-image-row.mobile-row .tk-image{height:581px;}
+  .tk-image-row .tk-image.mobile{width:auto;margin-left:0;margin-right:0;}
+  .tk-image-row .tk-image.mobile img{width:100%;height:100%;object-fit:contain;}
+  .tk-image img{width:100%;height:100%;object-fit:contain;border-radius:24px;}
+  .behind{background:transparent;border-radius:16px;padding:36px 0 12px;margin-bottom:56px;width:100%;}
+  .behind-label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;}
+  .behind-facts{display:flex;gap:32px;flex-wrap:wrap;padding-bottom:24px;margin-bottom:24px;}
+  .fact-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--fg-dim);margin-bottom:6px;}
+  .fact-value{font-size:14px;font-weight:700;}
+  .behind-narrative-label{font-size:15px;color:var(--accent);margin-bottom:8px;font-weight:700;}
+  .behind-narrative p{font-size:15px;color:var(--fg-dim);line-height:1.7;margin-bottom:28px;}
+
+  @media (max-width:860px){
+    .layout{flex-direction:column;}
+    .sidebar{position:relative;width:100%;height:auto;flex-direction:row;align-items:center;padding:20px 24px;gap:20px;}
+    .wordmark{margin-bottom:0;}
+    .sidebar nav{flex-direction:row;gap:16px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+    .sidebar nav::-webkit-scrollbar{display:none;}
+    .sidebar nav a{white-space:nowrap;flex:0 0 auto;}
+    .sidebar .status{display:none;}
+    .project-index{display:none;}
+    .hero-full p{font-size:clamp(31px,7.5vw,60px);}
+    .project-thumb-img,.project-thumb-img.single-mobile-hero{width:70cqw !important;height:auto !important;}
+    .project-section:nth-of-type(1) .project-thumb-img{width:49cqw !important;}
+    .project-section:nth-of-type(2) .project-thumb-img{width:84cqw !important;}
+    .project-section:nth-of-type(3) .project-thumb-img{width:91cqw !important;}
+    .project-section:nth-of-type(4) .project-thumb-img{width:49cqw !important;}
+    .project-section:nth-of-type(5) .project-thumb-img{width:91cqw !important;}
+    .has-thumb .project-content{margin-top:50px;}
+    .takeover-inner{padding:44px 20px 80px;}
+    .behind{padding:24px 22px 4px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="wordmark">Annie Zhao</div>
+    <nav id="sidebar-nav">
+      <a href="#intro" data-target="intro" class="active">Intro</a>
+      <a href="#work" data-target="work">Work</a>
+      <a href="#background" data-target="background">Background</a>
+      <a href="#contact" data-target="contact">Contact</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <section class="hero-full" id="intro">
+      <p>Hello, I'm Annie. I design monetization products at Instagram. For 15+ years, I've been turning ambiguous, high-stakes problems into products people actually use.</p>
+    </section>
+
+    <div id="work"></div>
+
+    <section class="background-section" id="background">
+      <p class="section-label">Background</p>
+
+      <div class="history-entry">
+        <div class="history-logo"><img src="images/job-icons/instagram.png" alt="Instagram"></div>
+        <div class="history-company-label">Instagram</div>
+        <div class="history-title">Staff Product Designer</div>
+        <div class="history-meta"><span>2022 – 2026</span><span>·</span><span>Seattle / Remote</span></div>
+        <div class="history-desc">I owned the end-to-end advertiser experience across ad objectives, budgeting, and payments, and led Boost on Web from 0 to ~30% of total Boost revenue. I drove Instagram's generative AI advertising work, from creative tools to chat-based ad creation.</div>
+      </div>
+
+      <div class="history-entry">
+        <div class="history-logo"><img src="images/job-icons/facebook.png" alt="Facebook"></div>
+        <div class="history-company-label">Facebook</div>
+        <div class="history-title">Senior Product Designer</div>
+        <div class="history-meta"><span>2018 – 2022</span><span>·</span><span>New York</span></div>
+        <div class="history-desc">I designed across the breadth of Facebook: recruiting tools used by the global hiring organization, billing and payments systems for advertisers, and consumer products across Marketplace and Community. I moved between enterprise and consumer work, leading projects from research through launch.</div>
+      </div>
+
+      <div class="history-entry">
+        <div class="history-logo"><img src="images/job-icons/jet.png" alt="Jet.com"></div>
+        <div class="history-company-label">Jet.com</div>
+        <div class="history-title">Senior Product Designer</div>
+        <div class="history-meta"><span>2017 – 2018</span><span>·</span><span>New York</span></div>
+        <div class="history-desc">I designed internal enterprise tools for category specialists — helping them manage their catalogs and track how products were performing, from what shipped to what sold.</div>
+      </div>
+
+      <div class="history-entry">
+        <div class="history-logo"><img src="images/job-icons/bloomberg.png" alt="Bloomberg"></div>
+        <div class="history-company-label">Bloomberg</div>
+        <div class="history-title">Senior UX Designer</div>
+        <div class="history-meta"><span>2015 – 2017</span><span>·</span><span>New York</span></div>
+        <div class="history-desc">I designed for the Bloomberg Terminal — building features for traders and analysts and contributing to the Terminal's design system.</div>
+      </div>
+
+      <div class="history-entry">
+        <div class="history-logo"><img class="invert" src="images/job-icons/samsung.png" alt="Samsung SmartThings"></div>
+        <div class="history-company-label">Samsung SmartThings</div>
+        <div class="history-title">UX Designer</div>
+        <div class="history-meta"><span>2013 – 2015</span><span>·</span><span>Palo Alto</span></div>
+        <div class="history-desc">I designed for the smart home — an app that had to talk to physical hardware, which meant designing the moments where software and the real world meet. I owned both UX and visual design.</div>
+      </div>
+
+      <div class="history-entry">
+        <div class="history-logo"><img src="images/job-icons/wepay.png" alt="WePay"></div>
+        <div class="history-company-label">WePay</div>
+        <div class="history-title">Lead UX Designer</div>
+        <div class="history-meta"><span>2012 – 2013</span><span>·</span><span>Palo Alto</span></div>
+        <div class="history-desc">I led UX and visual design for WePay's core product — a payments platform that helped small businesses get paid and manage their money online.</div>
+      </div>
+    </section>
+
+    <section class="contact-section" id="contact">
+      <div class="history-title">About me</div>
+      <p class="contact-bio">With 15+ years across enterprise advertising, payments, and internal platforms, I've built a career on products where the stakes are real and the systems are complex. I'm currently a Product Designer at Instagram, leading design for Boost across mobile and web. Previously I designed billing and payments systems at Facebook, worked on the Core Terminal at Bloomberg, and led design across e-commerce, payments, and IoT at Jet.com, WePay, and Samsung SmartThings. I trained as both an engineer and an artist — a Computer Science degree and a Fine Art degree — before completing my M.S. in Human-Computer Interaction at Carnegie Mellon. I live in San Diego, where the sun makes it very hard to stay inside.</p>
+      <div class="contact-row">
+        <a class="btn" href="#" target="_blank">LinkedIn</a>
+        <a class="btn" href="mailto:annieyue.zhao@gmail.com">annieyue.zhao@gmail.com</a>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="takeover" id="takeover">
+  <button class="takeover-close" id="takeover-close">&times;</button>
+  <div class="takeover-inner">
+    <div class="tk-text">
+      <h2 id="tk-title"></h2>
+      <div class="behind-facts">
+        <div><div class="fact-label">Role</div><div class="fact-value" id="tk-role"></div></div>
+        <div><div class="fact-label">Timeframe</div><div class="fact-value" id="tk-timeframe"></div></div>
+        <div><div class="fact-label">Tools</div><div class="fact-value" id="tk-tools"></div></div>
+      </div>
+    </div>
+    <div id="tk-images-top"></div>
+    <div class="tk-text">
+      <p class="section-index">People problem</p>
+      <p class="takeover-overview" id="tk-people-problem"></p>
+      <p class="section-index">Hypothesis</p>
+      <p class="takeover-overview" id="tk-hypothesis"></p>
+      <p class="section-index">My scope</p>
+      <p class="takeover-overview" id="tk-scope"></p>
+    </div>
+    <div id="tk-images-bottom"></div>
+    <div class="tk-text" id="tk-results-wrap">
+      <p class="section-index">Results to feature</p>
+      <p class="takeover-overview" id="tk-results"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const projects = [
+  {
+    tag: "Lead story — AI",
+    title: "Chat-Based Ad Creation",
+    role: "Design lead", timeframe: "2025–2026", tools: "Figma, Cursor, Devmate",
+    peopleProblem: "Small advertisers don't think in campaigns, audiences, and placements — they think \"I want more customers.\" Traditional ad creation flows force them to answer questions they don't understand, one form field at a time.",
+    hypothesis: "If advertisers could express their goal in natural language and have the system assemble the ad, more of them would start — and finish — creating ads.",
+    scope: "Set the design direction from concept, ran UXR to shape the interaction model, and drove design through development into alpha. The experience opens with AI recommendations for the ad; advertisers refine audience and budget through conversation and ask questions along the way, while the agent updates the ad setup live. When they're done, the flow returns them to a standard review screen — every ad is reviewed and confirmed by the advertiser before submission and payment.",
+    images: [
+      { src: "images/case-1-ai-ad-creation/ai-chat-hero.gif", type: "mobile", radius: 40 }
+    ],
+    thumb: "images/case-1-ai-ad-creation/ai-chat-hero.gif",
+    thumbRadius: 40,
+    singleMobileHero: true,
+    cardHeadline: "Chat-Based Ad Creation",
+    cardBody: "Reimagining ad creation as a conversation. Advertisers describe their goal in plain language, and AI assembles the ad — no forms, no jargon."
+  },
+  {
+    tag: "0 → 1 monetization",
+    title: "GenAI Creative Tools — Captions & Image Generation",
+    role: "Lead designer, end-to-end experience", timeframe: "2022–2024", tools: "Figma",
+    peopleProblem: "Most Boost advertisers aren't marketers. They have a post and a budget, but writing ad copy and producing visuals are skills they don't have and can't hire for.",
+    hypothesis: "Generative AI could close the creative-skill gap — but text and images demand different levels of user control, and the right treatment for each could only be determined through research.",
+    scope: "Led design for both features from exploration to build. Research revealed an asymmetry that shaped everything: with captions, advertisers wanted to know the feature existed, wanted an off switch and the ability to edit — but had little desire to review each generated variant, and experiments showed that auto-serving different caption variants to different users actually performed better. So caption generation became a quiet, low-touch item, tucked out of the main path. Image generation was the opposite: media is the most important element of an ad, and advertisers universally wanted to review, select, and choose their images — so it was baked directly into the core Boost flow. Same technology, opposite treatments, both decided by evidence.",
+    images: [
+      { src: "images/case-2-genai-caption-image/thumb.png", type: "mobile" },
+      { src: "images/case-2-genai-caption-image/drilldown-3.gif", type: "web" }
+    ],
+    thumb: "images/case-2-genai-caption-image/thumb.png",
+    thumbScale: 0.85,
+    thumbGap: 100,
+    cardHeadline: "GenAI Creative Tools — Captions & Image Generation",
+    cardBody: "Two generative AI features helping advertisers make better creatives: captions that quietly generate and serve the variation most likely to perform, and image generation that puts a set of AI-created visuals in advertisers' hands to pick from."
+  },
+  {
+    tag: "Platform constraint",
+    title: "Boost on Web",
+    role: "Design lead, payment flow", timeframe: "2022–2023", tools: "Figma",
+    peopleProblem: "Advertisers buying ads on iOS suddenly faced a 30% Apple service fee — paying more for the same result, often without understanding why. Meta needed a path that was better for advertisers, not just cheaper for Meta.",
+    hypothesis: "If the web experience reached parity with mobile and the fee tradeoff was communicated honestly at the moment of decision, advertisers would migrate willingly — no dark patterns required.",
+    scope: "Led design end to end for the 0→1 web product — boost flow, ad tools, and insights — plus the cross-surface steering strategy that moved advertisers from mobile to web.",
+    images: [
+      { src: "images/case-3-boost-on-web/mainhero.gif", type: "web" },
+      { src: "images/case-3-boost-on-web/set1.png", type: "web" },
+      { src: "images/case-3-boost-on-web/set2_1.png", type: "web" },
+      [
+        { src: "images/case-3-boost-on-web/set3_1.png", type: "mobile" },
+        { src: "images/case-3-boost-on-web/set3_2.png", type: "mobile" },
+        { src: "images/case-3-boost-on-web/set3_3.png", type: "mobile" },
+        { src: "images/case-3-boost-on-web/set3_4.png", type: "mobile" }
+      ]
+    ],
+    thumb: "images/case-3-boost-on-web/mainhero.gif",
+    thumbScale: 0.85,
+    cardHeadline: "Boost on Web",
+    cardBody: "When Apple's fee hit iOS ad purchases, I led the 0→1 design of Boost on web, growing it from ~0% to ~30% of Boost revenue."
+  },
+  {
+    tag: "Payments depth",
+    title: "Redesigning Payments Under Apple's 30%",
+    role: "Design lead, Payments", timeframe: "2019–2025", tools: "Figma",
+    peopleProblem: "IAP compliance forced five extra steps into the Boost flow, with payment details and Apple's fee surfacing only at the last screen. Advertisers reached the end, saw an unexplained price jump, and abandoned — drop-off driven by surprise, not price.",
+    hypothesis: "People don't abandon because fees exist; they abandon because fees ambush them. Making cost visible early — and giving advertisers ways to sidestep the fee entirely — would recover the funnel.",
+    scope: "Led design across three fronts: restructuring the flow to embed fee and payment breakdowns earlier and cut steps; redesigning the payment screen with transparent line items and budget-bundle explorations; and introducing new payment features — including auto-reload, a wallet where advertisers add funds upfront and spend them in-app without triggering Apple's fee.",
+    images: [
+      { src: "images/case-4-apple-iap/mainhero-1.gif", type: "mobile", radius: 40 },
+      { src: "images/case-4-apple-iap/drilldown-1.gif", type: "web" }
+    ],
+    thumb: "images/case-4-apple-iap/mainhero-1.gif",
+    thumbRadius: 40,
+    singleMobileHero: true,
+    cardHeadline: "Payment Experience Under IAP",
+    cardBody: "Apple's fee added five steps to the Boost purchase and a surprise charge at the end. I redesigned the payment experience around transparency — clearer flows, honest line items, and new features like auto-reload — and recovered the drop-off."
+  },
+  {
+    tag: "Enterprise",
+    title: "FBR Home — Tools for Recruiters",
+    role: "Design lead", timeframe: "2021–2022", tools: "Figma",
+    peopleProblem: "Recruiters and hiring managers lived across scattered tools with no single view of their pipeline — status checks, follow-ups, and handoffs all required hunting through systems or asking someone.",
+    hypothesis: "A single home surface with the right actions and insights would speed up the entire hiring loop, not just individual tasks.",
+    scope: "End-to-end design from research through launch, then extended it to managers: Manager Home reached 75% adoption within weeks (+5% outreaches), and the Actions & Insights integration cut feedback-to-debrief time from 8.9 to 5.3 days.",
+    images: [
+      { src: "images/case-5-facebook-recruiting/main-hero.gif", type: "web" },
+      { src: "images/case-5-facebook-recruiting/drilldown-1.gif", type: "web" },
+      { src: "images/case-5-facebook-recruiting/drilldown-2.png", type: "web" }
+    ],
+    thumb: "images/case-5-facebook-recruiting/main-hero.gif",
+    thumbScale: 0.85,
+    cardHeadline: "FBR Home — Tools for Recruiters",
+    cardBody: "Designed the homepage for Facebook's global recruiting platform from concept to launch, in some cases tripling adoption goals."
+  }
+];
+
+const work = document.getElementById('work');
+const bgShades = ['#141210','#161310','#121110','#151210','#131110'];
+projects.forEach((p, i) => {
+  const sec = document.createElement('div');
+  sec.className = 'project-section' + (p.thumb ? ' has-thumb' : '');
+  const placeholderMarkup = `
+    <div class="thumb-pattern"></div>
+    <span class="thumb-icon">Project thumbnail — replace with image</span>
+  `;
+  sec.style.background = p.thumb ? '#000000' : bgShades[i % bgShades.length];
+  sec.innerHTML = `
+    ${p.thumb ? (() => {
+      const styles = [];
+      if(p.thumbScale) styles.push(`height:${80 * p.thumbScale}vh`);
+      if(p.thumbRadius) styles.push(`border-radius:${p.thumbRadius}px`);
+      if(p.thumbGap) styles.push(`left:calc(46cqw + ${p.thumbGap}px)`);
+      const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
+      const cls = 'project-thumb-img' + (p.singleMobileHero ? ' single-mobile-hero' : '');
+      return `<img class="${cls}" src="${p.thumb}" alt="${p.title}"${styleAttr}>`;
+    })() : placeholderMarkup}
+    ${p.cardHeadline ? '' : `<div class="project-tag">${p.tag}</div>`}
+    <div class="project-index">0${i+1}</div>
+    <div class="project-content">
+      ${p.cardHeadline
+        ? `<div class="project-card-headline">${p.cardHeadline}</div><div class="project-card-body">${p.cardBody}</div>`
+        : `<div class="project-title">${p.title}</div><div class="project-oneliner">${p.oneLiner}</div><span class="project-cta">View case study →</span>`}
+    </div>
+  `;
+  sec.addEventListener('click', () => openTakeoverWithTransition(p, sec.querySelector('.project-thumb-img')));
+  work.appendChild(sec);
+
+  if(p.thumb){
+    const imgEl = sec.querySelector('.project-thumb-img');
+    const idxEl = sec.querySelector('.project-index');
+    const alignIndexToImage = () => {
+      const imgTop = imgEl.getBoundingClientRect().top;
+      const secTop = sec.getBoundingClientRect().top;
+      idxEl.style.top = (imgTop - secTop) + 'px';
+    };
+    new ResizeObserver(alignIndexToImage).observe(imgEl);
+    alignIndexToImage();
+  }
+});
+
+const takeover = document.getElementById('takeover');
+function isImagePath(str){ return /\.(png|jpe?g|webp|gif|svg)$/i.test(str || ''); }
+function normalizeImage(item){
+  return typeof item === 'string' ? { src: item, type: 'web' } : item;
+}
+function makeImageEl(item, altLabel){
+  const { src, type, radius } = normalizeImage(item);
+  const el = document.createElement('div');
+  el.className = 'tk-image';
+  if(type) el.classList.add(type);
+  if(isImagePath(src)){
+    el.classList.add('has-image');
+    const radiusStyle = radius ? ` style="border-radius:${radius}px"` : '';
+    el.innerHTML = `<img src="${src}" alt="${altLabel}"${radiusStyle}>`;
+    if(radius) el.style.borderRadius = radius + 'px';
+  } else {
+    el.innerHTML = `<span class="thumb-icon">${src}</span>`;
+  }
+  return el;
+}
+function renderImageRows(container, rows, altLabel){
+  container.innerHTML = '';
+  rows.forEach(row => {
+    const items = Array.isArray(row) ? row : [row];
+    if(items.length > 1){
+      const rowEl = document.createElement('div');
+      const allMobile = items.every(it => normalizeImage(it).type === 'mobile');
+      rowEl.className = 'tk-image-row' + (allMobile ? ' mobile-row' : '');
+      items.forEach(src => rowEl.appendChild(makeImageEl(src, altLabel)));
+      container.appendChild(rowEl);
+    } else {
+      container.appendChild(makeImageEl(items[0], altLabel));
+    }
+  });
+}
+let lastClickedThumb = null;
+const HERO_TRANSITION_NAME = 'hero-morph';
+function openTakeover(p){
+  document.getElementById('tk-title').textContent = p.title;
+  document.getElementById('tk-role').textContent = p.role;
+  document.getElementById('tk-timeframe').textContent = p.timeframe;
+  document.getElementById('tk-tools').textContent = p.tools;
+  document.getElementById('tk-people-problem').textContent = p.peopleProblem;
+  document.getElementById('tk-hypothesis').textContent = p.hypothesis;
+  document.getElementById('tk-scope').textContent = p.scope;
+
+  const resultsWrap = document.getElementById('tk-results-wrap');
+  if(p.results){
+    resultsWrap.style.display = '';
+    document.getElementById('tk-results').textContent = p.results;
+  } else {
+    resultsWrap.style.display = 'none';
+  }
+
+  const rows = p.images || [p.image1, p.image2].filter(Boolean);
+  renderImageRows(document.getElementById('tk-images-top'), rows.slice(0, 1), p.title);
+  renderImageRows(document.getElementById('tk-images-bottom'), rows.slice(1), p.title);
+
+  takeover.scrollTop = 0;
+  takeover.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTakeover(){
+  takeover.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function openTakeoverWithTransition(p, thumbEl){
+  lastClickedThumb = thumbEl || null;
+  const supportsVT = typeof document.startViewTransition === 'function';
+  if(!supportsVT || !thumbEl){
+    openTakeover(p);
+    return;
+  }
+  thumbEl.style.viewTransitionName = HERO_TRANSITION_NAME;
+  takeover.style.transition = 'none';
+  const vt = document.startViewTransition(() => {
+    thumbEl.style.viewTransitionName = '';
+    openTakeover(p);
+    const heroEl = document.querySelector('#tk-images-top .tk-image');
+    if(heroEl) heroEl.style.viewTransitionName = HERO_TRANSITION_NAME;
+  });
+  vt.finished.finally(() => {
+    thumbEl.style.viewTransitionName = '';
+    const heroEl = document.querySelector('#tk-images-top .tk-image');
+    if(heroEl) heroEl.style.viewTransitionName = '';
+    takeover.style.transition = '';
+  });
+}
+function closeTakeoverWithTransition(){
+  const supportsVT = typeof document.startViewTransition === 'function';
+  const heroEl = document.querySelector('#tk-images-top .tk-image');
+  if(!supportsVT || !heroEl || !lastClickedThumb){
+    closeTakeover();
+    return;
+  }
+  heroEl.style.viewTransitionName = HERO_TRANSITION_NAME;
+  takeover.style.transition = 'none';
+  const thumbEl = lastClickedThumb;
+  const vt = document.startViewTransition(() => {
+    heroEl.style.viewTransitionName = '';
+    closeTakeover();
+    thumbEl.style.viewTransitionName = HERO_TRANSITION_NAME;
+  });
+  vt.finished.finally(() => {
+    thumbEl.style.viewTransitionName = '';
+    takeover.style.transition = '';
+  });
+}
+document.getElementById('takeover-close').addEventListener('click', closeTakeoverWithTransition);
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeTakeoverWithTransition(); });
+
+/* scrollspy for sidebar nav */
+const navLinks = Array.from(document.querySelectorAll('#sidebar-nav a'));
+const sectionIds = navLinks.map(a => a.dataset.target);
+const sections = sectionIds.map(id => document.getElementById(id));
+const spyObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const link = navLinks.find(a => a.dataset.target === entry.target.id);
+    if(entry.isIntersecting && link){
+      navLinks.forEach(a => a.classList.remove('active'));
+      link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(sec => sec && spyObserver.observe(sec));
+</script>
+</body>
+</html>
